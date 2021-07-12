@@ -1,0 +1,833 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!--
+This page and all contents are Copyright �2001-2021 by David M. Spaar
+-->
+<html>
+    <HEAD>
+        <TITLE>DHTML Guessing Game</TITLE>
+	<style type="text/css">
+	div {
+		border-radius: 2px;
+	}
+	</style>
+        <SCRIPT LANGUAGE="JavaScript">
+        // check browser
+		var bIsIE = navigator.appName == "Microsoft Internet Explorer";
+        //if (!bIsIE) location.href = "sorry.html";
+		
+		// declare globals
+		var bShowChildren = new Boolean(false);
+        //var arrColors = new Array("red","blue","yellow","green","orange","indigo","slategray","violet");
+		var arrColors = new Array();
+		var arrUserPalette = new Array();
+		var arrPalette = new Array();
+        var curDiv = new Object();
+		var intGuesses = 0;
+		var intSquares = 5;
+		var intColors = 8;
+		var strGuessDiv = "";
+		var bRandomPalette  = new Boolean(false);
+		
+		// create the array of colors that can be used
+		arrColors[0] = "aliceblue";
+		arrColors[1] = "white";
+		arrColors[2] = "aqua";
+		arrColors[3] = "aquamarine";
+		arrColors[4] = "azure";
+		arrColors[5] = "beige";
+		arrColors[6] = "bisque";
+		arrColors[7] = "black";
+		arrColors[8] = "blanchedalmond";
+		arrColors[9] = "blue";
+		arrColors[10] = "blueviolet";
+		arrColors[11] = "brown";
+		arrColors[12] = "burlywood";
+		arrColors[13] = "cadetblue";
+		arrColors[14] = "chartreuse";
+		arrColors[15] = "chocolate";
+		arrColors[16] = "coral";
+		arrColors[17] = "cornflowerblue";
+		arrColors[18] = "cornsilk";
+		arrColors[19] = "crimson";
+		arrColors[20] = "cyan";
+		arrColors[21] = "darkblue";
+		arrColors[22] = "darkcyan";
+		arrColors[23] = "darkgoldenrod";
+		arrColors[24] = "darkgray";
+		arrColors[25] = "darkgreen";
+		arrColors[26] = "darkkhaki";
+		arrColors[27] = "darkmagenta";
+		arrColors[28] = "darkolivegreen";
+		arrColors[29] = "darkorange";
+		arrColors[30] = "darkorchid";
+		arrColors[31] = "darkred";
+		arrColors[32] = "darksalmon";
+		arrColors[33] = "darkseagreen";
+		arrColors[34] = "darkslateblue";
+		arrColors[35] = "darkslategray";
+		arrColors[36] = "darkturquoise";
+		arrColors[37] = "darkviolet";
+		arrColors[38] = "deeppink";
+		arrColors[39] = "deepskyblue";
+		arrColors[40] = "dimgray";
+		arrColors[41] = "dodgerblue";
+		arrColors[42] = "firebrick";
+		arrColors[43] = "floralwhite";
+		arrColors[44] = "forestgreen";
+		arrColors[45] = "fuchsia";
+		arrColors[46] = "gainsboro";
+		arrColors[47] = "ghostwhite";
+		arrColors[48] = "gold";
+		arrColors[49] = "goldenrod";
+		arrColors[50] = "gray";
+		arrColors[51] = "green";
+		arrColors[52] = "greenyellow";
+		arrColors[53] = "honeydew";
+		arrColors[54] = "hotpink";
+		arrColors[55] = "indianred";
+		arrColors[56] = "indigo";
+		arrColors[57] = "ivory";
+		arrColors[58] = "khaki";
+		arrColors[59] = "lavender";
+		arrColors[60] = "lavenderblush";
+		arrColors[61] = "lawngreen";
+		arrColors[62] = "lemonchiffon";
+		arrColors[63] = "lightblue";
+		arrColors[64] = "lightcoral";
+		arrColors[65] = "lightcyan";
+		arrColors[66] = "lightgoldenrodyellow";
+		arrColors[67] = "lightgreen";
+		arrColors[68] = "lightgrey";
+		arrColors[69] = "lightpink";
+		arrColors[70] = "lightsalmon";
+		arrColors[71] = "lightseagreen";
+		arrColors[72] = "lightskyblue";
+		arrColors[73] = "lightslategray";
+		arrColors[74] = "lightsteelblue";
+		arrColors[75] = "lightyellow";
+		arrColors[76] = "lime";
+		arrColors[77] = "limegreen";
+		arrColors[78] = "linen";
+		arrColors[79] = "magenta";
+		arrColors[80] = "maroon";
+		arrColors[81] = "mediumaquamarine";
+		arrColors[82] = "mediumblue";
+		arrColors[83] = "mediumorchid";
+		arrColors[84] = "mediumpurple";
+		arrColors[85] = "mediumseagreen";
+		arrColors[86] = "mediumslateblue";
+		arrColors[87] = "mediumspringgreen";
+		arrColors[88] = "mediumturquoise";
+		arrColors[89] = "mediumvioletred";
+		arrColors[90] = "midnightblue";
+		arrColors[91] = "mintcream";
+		arrColors[92] = "mistyrose";
+		arrColors[93] = "moccasin";
+		arrColors[94] = "navajowhite";
+		arrColors[95] = "navy";
+		arrColors[96] = "oldlace";
+		arrColors[97] = "olive";
+		arrColors[98] = "olivedrab";
+		arrColors[99] = "orange";
+		arrColors[100] = "orangered";
+		arrColors[101] = "orchid";
+		arrColors[102] = "palegoldenrod";
+		arrColors[103] = "palegreen";
+		arrColors[104] = "paleturquoise";
+		arrColors[105] = "palevioletred";
+		arrColors[106] = "papayawhip";
+		arrColors[107] = "peachpuff";
+		arrColors[108] = "peru";
+		arrColors[109] = "pink";
+		arrColors[110] = "plum";
+		arrColors[111] = "powderblue";
+		arrColors[112] = "purple";
+		arrColors[113] = "red";
+		arrColors[114] = "rosybrown";
+		arrColors[115] = "royalblue";
+		arrColors[116] = "saddlebrown";
+		arrColors[117] = "salmon";
+		arrColors[118] = "sandybrown";
+		arrColors[119] = "seagreen";
+		arrColors[120] = "seashell";
+		arrColors[121] = "sienna";
+		arrColors[122] = "silver";
+		arrColors[123] = "skyblue";
+		arrColors[124] = "slateblue";
+		arrColors[125] = "slategray";
+		arrColors[126] = "snow";
+		arrColors[127] = "springgreen";
+		arrColors[128] = "steelblue";
+		arrColors[129] = "tan";
+		arrColors[130] = "teal";
+		arrColors[131] = "thistle";
+		arrColors[132] = "tomato";
+		arrColors[133] = "turquoise";
+		arrColors[134] = "violet";
+		arrColors[135] = "wheat";
+		arrColors[136] = "blue";
+		arrColors[137] = "whitesmoke";
+		arrColors[138] = "yellow";
+		arrColors[139] = "yellowgreen";
+		
+		/**************************************************************************************
+		debugging function
+		**************************************************************************************/
+		function tmpCheck()
+		{
+			var t = "";
+			for(i=0;i<arrPalette.length;i++)
+			{
+				t += arrPalette[i] + " | ";
+			}
+			alert(t);
+		}
+		
+		/**************************************************************************************
+		createAllColorDiv
+		this function creates a div with each color in the arrColors array.  it returns an array containing:
+			-	a string containing the HTML representation of the DIV tags to display the colors
+			-	the maximum number of columns
+			-	the top position of the last element
+		**************************************************************************************/
+		function createAllColorDiv(strOnClick)
+		{
+			var s = "";
+			var iMax = Math.ceil(Math.sqrt(arrColors.length));
+			var iRow = 0;
+			var iTop = 5;
+			var iLeft = 5;
+			var arrReturn = new Array();
+			
+			for (i=0; i<arrColors.length; i++) {
+				iLeft = 5 + iRow * 25;
+				s += "<DIV ID=\"clr_" + i + "\" STYLE=\"position: absolute; top: " + iTop + "px; left: " + iLeft + "px; background-color: " + arrColors[i] + "; height: 20px; width:20px; border: black 1px solid;\" ONCLICK=" + strOnClick + "></DIV>";
+				iRow++;
+				if (iRow == iMax) {
+					iRow = 0;
+					iTop += 25;
+				}
+			}
+			
+			arrReturn[0] = s;
+			arrReturn[1] = iMax;
+			arrReturn[2] = iTop;
+			
+			return arrReturn;
+		}
+		
+		/**************************************************************************************
+		createNoColorDiv
+		this function returns the same as the createAllColorDiv function except that the palette is all white background
+		**************************************************************************************/
+		function createNoColorDiv(strOnClick)
+		{
+			var s = "";
+			var iMax = Math.ceil(Math.sqrt(arrColors.length));
+			var iRow = 0;
+			var iTop = 5;
+			var iLeft = 5;
+			var arrReturn = new Array();
+			
+			for (i=0; i<arrColors.length; i++) {
+				iLeft = 5 + iRow * 25;
+				s += "<DIV ID=\"plt_" + i + "\" STYLE=\"position: absolute; top: " + iTop + "px; left: " + iLeft + "px; background-color: white; height: 20px; width:20px; border: black 1px solid;\" ONCLICK=" + strOnClick + "></DIV>";
+				iRow++;
+				if (iRow == iMax) {
+					iRow = 0;
+					iTop += 25;
+				}
+			}
+			
+			arrReturn[0] = s;
+			arrReturn[1] = iMax;
+			arrReturn[2] = iTop;
+			
+			return arrReturn;
+		}
+		
+		/**************************************************************************************
+		setGameBG
+		this function uses the createAllColorDiv function to create a palette, then it displays the palette with the
+		gameSelect div.  the created palette allows the user to select a new background color for the board.
+		**************************************************************************************/
+		function setGameBG()
+		{
+			var arrInfo = new Array();
+			var strOnClick =" \"document.all.Master.style.backgroundColor = this.style.backgroundColor;document.all.Answers.style.backgroundColor = this.style.backgroundColor;this.parentElement.style.visibility='hidden';\""
+			
+			arrInfo = createAllColorDiv(strOnClick);
+			
+			document.all.gameSelect.style.posWidth = arrInfo[1] * 25 + 5;
+			if (Math.sqrt(intColors) == arrInfo[1]) {
+				document.all.gameSelect.style.posHeight = arrInfo[2] + "px";
+			}
+			else {
+				document.all.gameSelect.style.posHeight = (arrInfo[2] + 25) + "px";
+			}
+			document.all.gameSelect.innerHTML = arrInfo[0];
+			document.all.gameSelect.style.posTop = "200px";
+			document.all.gameSelect.style.posLeft = "550px";
+			document.all.gameSelect.style.visibility = "visible";
+		}
+		
+		/**************************************************************************************
+		updateUserPalette
+		this function sets the next available palette cell to the value of the strColor parameter
+		**************************************************************************************/
+		function updateUserPalette(strColor)
+		{
+			var i = arrUserPalette.length;
+			arrUserPalette[i] = strColor;
+			eval("document.all.plt_" + i + ".style.backgroundColor = '" + strColor + "';");
+		}
+		
+		/**************************************************************************************
+		removePaletteColor
+		**************************************************************************************/
+		function removePaletteColor(objDiv)
+		{
+			var strName = objDiv.id;
+			if (strName.indexOf("_") == -1) return false;
+
+			var iCell = strName.substr(strName.indexOf("_")+1, strName.length);
+			var arrTemp = new Array();
+			
+			// create temp array
+			for (i=0; i < arrUserPalette.length; i++) {
+				if (i != iCell) {
+					arrTemp[arrTemp.length] = arrUserPalette[i];
+				}
+			}
+			
+			// remove all array members
+			arrUserPalette.length = 0;
+			
+			// repopulate array and set user's display palette to current values
+			for (i=0; i < arrTemp.length; i++) {
+				arrUserPalette[arrUserPalette.length] = arrTemp[i];
+				eval("document.all.plt_" + i + ".style.backgroundColor = '" + arrTemp[i] + "';");
+			} 
+			// set final cell to white
+			eval("document.all.plt_" + arrUserPalette.length + ".style.backgroundColor = 'white';");
+			
+		}
+		
+		/**************************************************************************************
+		makeUserPalette
+		this function writes the HTML to create the selection dialog for the user palette
+		**************************************************************************************/
+		function makeUserPalette()
+		{
+			var arrInfo = new Array();
+			var strHTML = "";
+			var strSelectPaletteClick = "\"updateUserPalette(this.style.backgroundColor);\""
+			var strDisplayPaletteClick = "\"removePaletteColor(this);\""
+			var iWidth = 0;
+			var iHeight = 0;
+			
+			arrInfo = createAllColorDiv(strSelectPaletteClick);
+			iWidth += arrInfo[1] * 25 + 5;
+			iHeight += arrInfo[2] + 25;
+			strHTML += "<DIV STYLE=\"position: absolute; left: 0px; top: 0px; width:" + iWidth + "px; height: " + iHeight 
+						+ "px;\">" + arrInfo[0] + "</DIV>";
+			
+			arrInfo.length = 0;
+			
+			arrInfo = createNoColorDiv(strDisplayPaletteClick);
+			strHTML += "<DIV STYLE=\"position: absolute; left: " + iWidth + "px; top: 0px; width:" + iWidth + "px; height: " 
+			+ iHeight + "px; border: black 1px solid;\">" + arrInfo[0] + "</DIV>"
+			+ "<DIV STYLE=\"position: absolute; top: " + iHeight + "px;  left: 5px; border: black 1px solid;\" ONCLICK=\"document.all.gameSelect.style.visibility = 'hidden';\"><B>CLOSE</B></DIV>";
+
+			strHTML += "<DIV ID=\"userPick\" STYLE=\"position: absolute; top: " + iHeight + "px; width: 20px; height: 20px; left: 80px;background-color: black;\" ONCLICK=" + strSelectPaletteClick + "></DIV>";
+			strHTML += "<DIV STYLE=\"position: absolute; top: " + iHeight + "px; height: 20px; left: 105px;\" ONCLICK=\"makeColor()\"><b>CHOOSE COLOR</b></DIV>";
+			iWidth += arrInfo[1] * 25 + 5;
+			
+			document.all.gameSelect.style.posWidth = iWidth + "px";
+			if (Math.sqrt(intColors) == arrInfo[1]) {
+				document.all.gameSelect.style.posHeight = iHeight + "px";
+			}
+			else {
+				document.all.gameSelect.style.posHeight = (iHeight + 25) + "px";
+			}
+			document.all.gameSelect.innerHTML =strHTML;
+			document.all.gameSelect.style.posTop = 200;
+			document.all.gameSelect.style.posLeft = 250;
+			
+			for (i=0;i<arrUserPalette.length;i++) {
+				eval("document.all.plt_" + i + ".style.backgroundColor = '" + arrUserPalette[i] + "';");
+			}
+			
+			document.all.gameSelect.style.visibility = "visible";
+		}
+		
+		/**************************************************************************************
+		setPaletteColors
+		sets the colors for the arrPalette array
+		**************************************************************************************/
+		function setPaletteColors()
+		{
+			var bOK = true;
+			var s = "_";
+			var x;
+			
+			// if a low number of colors then select the ones to include
+			if (intColors <= 100) {
+				for (i=0; i < intColors; i++) {
+					bOK = false;
+					while (!bOK) {
+						x = Math.floor(Math.random()*140);
+						if (s.indexOf(arrColors[x]) == -1) bOK = true; // && (x < 63 || x > 75)
+					}
+				
+					arrPalette[i] = arrColors[x];
+					s += arrColors[x] + "_";
+				}
+			}
+			// select the ones to exclude
+			else {
+				iDiff = arrColors.length - intColors;
+				for (i=0; i < iDiff; i++) {
+					bOK = false;
+					while (!bOK) {
+						x = Math.floor(Math.random()*140);
+						if (s.indexOf(arrColors[x]) == -1) bOK = true; // && (x < 63 || x > 75)
+					}
+					
+					//arr[arr.length]  = x;
+					s += arrColors[x] + "_";
+				}
+				
+				for (i=0; i<arrColors.length; i++) {
+					bOK = true;
+					
+					if (s.indexOf(arrColors[i]) != -1) bOK = false; // && (x < 63 || x > 75)
+										
+					if (bOK) arrPalette[arrPalette.length] = arrColors[i];
+				}
+			}
+		}
+		
+		/**************************************************************************************
+		makePalette
+		write the HTML that displays as the current game palette for guessing purposes
+		**************************************************************************************/
+		function makePalette()
+		{		
+			var s = "";
+			setPaletteColors();
+			iMax = Math.ceil(Math.sqrt(intColors));
+			iRow = 0;
+			iTop = 5;
+			iLeft = 5;
+			
+			if (document.all.chkUserPalette.checked) {
+				if (intColors > arrUserPalette.length) {
+					alert("Too few colors in User Palette to meet requested amount.");
+					intColors = arrUserPalette.length;
+				}
+				for (i=0; i<intColors; i++) {
+					iLeft = 5 + iRow * 25;
+					s += "<DIV STYLE=\"position: absolute; top: " + iTop + "px; left: " + iLeft + "px; background-color: " + arrUserPalette[i] + "; height: 20px; width:20px; border: black 1px solid;\" ONCLICK=\"setGuess(this.style.backgroundColor)\"></DIV>";
+					iRow++;
+					if (iRow == iMax) {
+						iRow = 0;
+						iTop += 25;
+					}
+				}
+			}
+			else {
+				for (i=0; i<intColors; i++) {
+					iLeft = 5 + iRow * 25;
+					s += "<DIV STYLE=\"position: absolute; top: " + iTop + "px; left: " + iLeft + "px; background-color: " + arrPalette[i] + "; height: 20px; width:20px; border: black 1px solid;\" ONCLICK=\"setGuess(this.style.backgroundColor)\"></DIV>";
+					iRow++;
+					if (iRow == iMax) {
+						iRow = 0;
+						iTop += 25;
+					}
+				}
+			}
+			
+			document.all.colorSelect.style.posWidth = (iMax * 25 + 5) + "px";
+			if (Math.sqrt(intColors) == iMax) {
+				document.all.colorSelect.style.posHeight = iTop + "px";
+			}
+			else {
+				document.all.colorSelect.style.posHeight = (iTop + 25) + "px";
+			}
+			document.all.colorSelect.innerHTML = s;
+		}
+		
+		/**************************************************************************************
+		checkGuess
+		the game engine, checks a user's current guess and notifies them of the results
+		**************************************************************************************/
+		function checkGuess(obj)
+		{
+			var a = obj.children;
+			var m = document.all.Master.children;
+			var intCountExact = 0;
+			var intCountRight = 0;
+			var intCount = 0;
+			var strAnswer = "";
+			var strChecked = "_";
+			var arrIndexes = new Array();
+			var intIndex = 0;
+			var bDoCheck = new Boolean(true);
+			
+			// increment guess counter
+			intGuesses++;
+			
+			
+			// review guesses
+			for(i=0;i<intSquares;i++)
+			{
+				// check if the guess in position i is the same as the master in position i
+				if (a[i].style.backgroundColor == m[i].style.backgroundColor)  intCountExact++;
+			}
+			
+			// check if all colors have been matched
+			if (intCountExact == intSquares) {
+				// reveal master color display
+				gameDone();
+				
+				// notify player of victory
+				alert("Congratulations!  You've won in " + intGuesses + " turns.");
+				
+				// check if the player wishes to play again
+				if (confirm("Would you like another game?")) newGame();
+				
+				return true;
+			}
+
+			// check if colors are correct but in wrong position
+			// when a guess is matched to a master color, both are removed from further analysis		
+			for(i=0;i<intSquares;i++)		// i increments the guess
+			{
+				for(j=0;j<intSquares;j++)	// j increments the master
+				{
+					// check if current j value should be skipped
+					for(k=0;k<arrIndexes.length;k++)
+					{
+						//alert("k = " + k + " is " + arrIndexes[k]);
+						//alert("j = " + j);
+						if (j == arrIndexes[k]) bDoCheck = false;
+					}
+					
+					// check if appropriate
+					if (bDoCheck) {
+						if (a[i].style.backgroundColor == m[j].style.backgroundColor) {
+							//alert("i = " + i + "\nj = " + j);
+							
+							// add the current master color index to the list of those to skip
+							arrIndexes[intIndex] = j;
+							
+							// increase the index of the array for indexes to skip to the next value
+							intIndex++;
+							
+							// increment the counter
+							intCountRight++;
+							
+							// move on to the next guess to evaluate
+							i++;
+							
+							// resume the counting for the first available master color
+							j = -1;
+						}
+					}
+					
+					// return check indicator to default value of true
+					bDoCheck = true;
+				}
+			}
+
+			intCount = intCountRight - intCountExact;
+
+			//alert(intCountExact);
+			//alert(intCountRight);
+			//alert(intCount);
+			
+			while(intCountExact > 0)
+			{
+				strAnswer += "X";
+				intCountExact--;
+			}
+						
+			while(intCount > 0)
+			{
+				strAnswer += "O";
+				intCount--;
+			}
+			
+			if (strAnswer == "") strAnswer = "NONE";
+
+			for(i=0;i<intSquares;i++)
+			{
+				a[i].onclick = "";
+			}
+			
+			a[intSquares].outerHTML = "<DIV STYLE=\"position: absolute; top: 5px; left: " + (5 + 25 * intSquares) + "px; background-color: white; height: 20px; width:" + (95 + 5 * intSquares) + "px; border: black 1px solid;\" ALIGN=\"CENTER\">" + strAnswer + "</DIV>";
+
+			strAnswer = document.all.Answers.innerHTML;
+			document.all.Answers.innerHTML = strGuessDiv + strAnswer;
+		}
+		
+		/**************************************************************************************
+		buildGuessDiv
+		this function writes the HTML that is used to create a new guess sequence
+		**************************************************************************************/
+		function buildGuessDiv()
+		{
+			var iLeft = 5;
+			strGuessDiv = "";
+			for (i=0; i < intSquares; i++) {
+				strGuessDiv += "<DIV STYLE=\"position: absolute; top: 5px; left: " + iLeft + "px; background-color: white; height: 20px; width:20px; z-index:3; border: black 1px solid;\" ONCLICK=\"showPalette(this)\"></DIV>";
+				iLeft += 25;
+			}
+			
+			strGuessDiv += "<DIV STYLE=\"position: absolute; top: 5px; left: " + iLeft + "px; background-color: white; height: 20px; width:" + (95 + 5 * intSquares) + "px; z-index:3; border: black 1px solid;\" ONCLICK=\"checkGuess(this.parentElement)\" ALIGN=\"CENTER\"><input type=Button  value=\"GUESS\" style=\"height:20;width:80;font-family:verdana;font-size: 8pt\"></DIV>";
+
+			strGuessDiv = "<DIV STYLE=\"position: relative; height: 30px; width: " + (iLeft + 100 + 5 * intSquares) + "px; z-index:0\">" + strGuessDiv + "</DIV>";
+		}	
+		
+		/**************************************************************************************
+		buildMasterDiv
+		this builds the master div that contains the number of cells equal to that desired by the user
+		**************************************************************************************/
+		function buildMasterDiv()
+		{
+			var iLeft = 5;
+			var s = "";
+			for (i=1; i <= intSquares; i++) {
+				s += "<DIV ID=\"master_" + i + "\" STYLE=\"position: absolute; top: 5px; left: " + iLeft +"px; background-color: white; height: 20px; width:20px; border: black 1px solid;\"></DIV>";
+				iLeft += 25;
+			}
+			
+			s += "<DIV ID=\"cover\" STYLE=\"position: absolute; top: 0px; left: 0px; width: " + iLeft +"; height: 30px; visibility: hidden; z-index: 10; background-color: black; border: black 1px solid;\"></DIV>";
+
+			document.all.Master.style.posWidth = iLeft;
+			document.all.Master.innerHTML = s;
+		}
+		
+		/**************************************************************************************
+		makeColor
+		this function displays a palette that can be used to select specific colors from the 24 bit family
+		using the rgb() function
+		**************************************************************************************/
+		function makeColor()
+		{
+			var strHTML = "";
+			var strHTML = "<table align=\"center\" cellspacing=\"5px\" cellpadding=\"5px\" border=\"0px\"><tr>";
+			strHTML += "<td>Red: " + makeSelectBox() + "</td>";
+			strHTML += "<td rowspan=\"3\"><SPAN ID=\"curColor\" STYLE=\"width: 60px; height: 60px; background-color: rgb(255,255,255);\"></SPAN></td></tr>";
+			strHTML += "<tr><td>Green: " + makeSelectBox() + "</td></tr>";
+			strHTML += "<tr><td>Blue: " + makeSelectBox() + "</td></tr>";
+			strHTML += "<tr><td colspan=2><INPUT TYPE=\"button\" VALUE=\"Apply\" ONCLICK=\"document.all.userPick.style.backgroundColor = document.all.curColor.style.backgroundColor;document.all.colorPicker.style.visibility = 'hidden'\"></TD></tr>";
+			strHTML += "</table>";
+
+			document.all.colorPicker.innerHTML = strHTML;
+			document.all.colorPicker.style.posLeft = document.all.gameSelect.style.posLeft + 100;
+			document.all.colorPicker.style.posTop = document.all.gameSelect.style.posTop + 100;
+			document.all.colorPicker.style.border = "groove black 4px";
+			document.all.colorPicker.style.visibility = "visible";
+		}
+
+		function makeSelectBox()
+		{
+			var s = "";
+			s += "<SELECT NAME=\"curColorPick\" SIZE=1 ONCHANGE=\"updateColorPicked()\">";
+			for (j=0; j < 256; j++) {
+				s += "<OPTION VALUE=" + j + ">" + j + "</OPTION>";
+			}
+			s += "</SELECT>";
+			
+			return s;	
+		}
+		
+		function updateColorPicked()
+		{
+			var iRed = document.all.curColorPick[0].value;
+			var iGreen = document.all.curColorPick[1].value;
+			var iBlue = document.all.curColorPick[2].value;
+			
+			//alert(rgb(iRed, iGreen, iBlue));
+			
+			iRed = "" + getHex(iRed);
+			iGreen = "" + getHex(iGreen);
+			iBlue = "" + getHex(iBlue);
+			
+			if (iRed.length == 1) iRed = "0" + iRed;
+			if (iGreen.length == 1) iGreen = "0" + iGreen;
+			if (iBlue.length == 1) iBlue = "0" + iBlue;
+			//alert(eval("'#" + iRed + iGreen + iBlue + "'"));
+			document.all.curColor.style.backgroundColor = eval("'#" + iRed + iGreen + iBlue + "'");
+		}
+        </SCRIPT>
+		<script language="VBScript">
+		function getHex(iNum)
+		
+			//msgbox iNum
+			getHex = Hex(CInt(iNum))
+			
+		end function
+		</script>
+    </HEAD>
+<BODY onload="buildMasterDiv();curDiv = document.body.children[0];">
+<DIV ID="controls" STYLE="LEFT: 20px; WIDTH: 350px; POSITION: absolute; TOP: 20px"  onclick="palette.visibility='hidden';curDiv.style.border = '';">
+<H2 STYLE="FONT-FAMILY: verdana">GuessMaster Extreme</H2>
+<BR><!--<INPUT TYPE=button value="Check" onclick="alert(this.parentElement.id)">
+<BR>//tmpCheck();//document.all.txtHTML.value = document.all.colorSelect.innerHTML -->
+<SPAN STYLE="FONT-SIZE: 8pt; FONT-FAMILY: verdana">
+<table>
+<tr><td STYLE="FONT-SIZE: 8pt; FONT-FAMILY: verdana">Start a new game:</td><td STYLE="FONT-SIZE: 8pt; FONT-FAMILY: verdana"><INPUT TYPE=button value="New Game  " onclick="newGame()" style="WIDTH: 100px; POSITION: static"></td></tr>
+<tr><td STYLE="FONT-SIZE: 8pt; FONT-FAMILY: verdana">Reveal the hidden code:</td><td STYLE="FONT-SIZE: 8pt; FONT-FAMILY: verdana"><INPUT TYPE=button value="  Reveal Code" onclick="gameDone()" style="WIDTH: 100px; POSITION: static"></td></tr>
+<tr><td STYLE="FONT-SIZE: 8pt; FONT-FAMILY: verdana">Set board background color:</td><td STYLE="FONT-SIZE: 8pt; FONT-FAMILY: verdana"><INPUT TYPE=button value="Background" onclick="setGameBG()" style="WIDTH: 100px; POSITION: static"></td></tr>
+<tr><td STYLE="FONT-SIZE: 8pt; FONT-FAMILY: verdana">Open the user palette:</td><td STYLE="FONT-SIZE: 8pt; FONT-FAMILY: verdana"><input type="button" name="" value="User Palette" style="WIDTH: 100px; POSITION: static" onClick="makeUserPalette()"></td></tr>
+<tr><td STYLE="FONT-SIZE: 8pt; FONT-FAMILY: verdana">Check to use the colors you've selected:</td><td STYLE="FONT-SIZE: 8pt; FONT-FAMILY: verdana"><input type="checkbox" name="chkUserPalette">&nbsp;Use User &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Palette</td></tr>
+<tr><td STYLE="FONT-SIZE: 8pt; FONT-FAMILY: verdana">No. of Colors:</td><td STYLE="FONT-SIZE: 8pt; FONT-FAMILY: verdana"><INPUT NAME="colors" SIZE="6" MAXLENGTH="6" ></td></tr>
+<tr><td STYLE="FONT-SIZE: 8pt; FONT-FAMILY: verdana">No. of Squares:</td><td STYLE="FONT-SIZE: 8pt; FONT-FAMILY: verdana"><INPUT NAME="squares" SIZE="6" MAXLENGTH="6" ></td></tr>
+</table>
+<br><br>
+This is a flexible color guessing game.  To start a game, click on the "New Game" button.  The cells to the right will be 
+covered and each will be randomly assigned one of a selection of colors.  You may choose the number of colors to 
+select from and the number of squares to encode using the input boxes with the corresponding labels.  The default game uses 8 colors 
+in 5 squares.
+<br><br>
+When the New Game button is pushed a new set of cells will appear
+with the word "GUESS" to their right.  Click on each cell to display a color
+selection palette for the cell, then click on a palette color to select it for
+the cell.  You may change your selection as many times as you like until you
+click on the "GUESS" button.
+<BR><BR>
+Once your guess is submitted, the game will return either a value of "NONE" 
+where the word "GUESS" was, or else a string of "X"'s and "O"'s to indicate
+the correctness of the guess.  Each "X" indicates a color guess that is correct
+and in the correct position.  Each "O" indicates a color guess that is correct but
+in the wrong position.  Try to determine the hidden color sequence in as few 
+guesses as possible.
+<BR><BR>
+To abandon a game, click the "Reveal Code" button if you want to see the hidden colors,
+or else just click the "New Game" button to start over with a new code.
+<br><br>
+If you find that the selection of colors is hard to differentiate, the background button provides a selection of colors that can be used to adjust the background of the gameboard.  Click on the "Background" button and then click on the color you desire to change the board color.
+<BR><BR>
+The User Palette allows you to select a subset of the available colors in order to make a palette of your own.   To use it, simply click on a color on the left-hand selection palette to copy it to the right-hand user palette.  To remove a color, click on it on the right-hand user palette.  To mix a color of your own, click on the "CHOOSE COLOR" text, then adjust the RGB (red, green, blue) values until the large square is the color you desire, click "Apply", then click on the newly-colored square next to the "CHOOSE COLOR" text.  Click on the "CLOSE" text to close the User Palette.
+</SPAN><BR><br>
+<div id="copyright" style="FONT-WEIGHT: normal; FONT-SIZE: 7pt; Z-INDEX: 10000">This page and all contents are Copyright �2001-2007 by <A href="mailto:dspaar@aol.com">David M. Spaar</a></div>
+</DIV><!--
+<DIV ID="txtTemp" STYLE="position: absolute; top: 30; left: 650;">
+<textarea name="txtHTML" cols="200" rows="40" wrap="PHYSICAL"></textarea>
+</DIV> -->
+
+<DIV ID="Master" STYLE="LEFT: 400px; WIDTH: 130px; POSITION: absolute; TOP: 30px; HEIGHT: 30px; BACKGROUND-COLOR: antiquewhite"  onclick="palette.visibility='hidden';curDiv.style.border = '';">
+</DIV>
+
+<DIV ID="colorSelect" STYLE="Z-INDEX: 100; LEFT: 50px; VISIBILITY: hidden; WIDTH: 105px; POSITION: absolute; TOP: 100px; HEIGHT: 55px; BACKGROUND-COLOR: #c0c0c0">
+</DIV>
+
+<DIV ID="gameSelect" STYLE="Z-INDEX: 1010; LEFT: 550px; VISIBILITY: hidden; WIDTH: 105px; POSITION: absolute; TOP: 200px; HEIGHT: 55px; BACKGROUND-COLOR: #c0c0c0">
+</DIV>
+
+<DIV ID="colorPicker" STYLE="Z-INDEX: 1020; LEFT: 550px; VISIBILITY: hidden; WIDTH: 105px; POSITION: absolute; TOP: 200px; HEIGHT: 55px; BACKGROUND-COLOR: #c0c0c0">
+</DIV>
+
+<DIV ID="Answers" STYLE="LEFT: 400px; POSITION: absolute; TOP: 100px; BACKGROUND-COLOR: antiquewhite">
+</DIV>
+
+<DIV ID="EvtHdlr" STYLE="Z-INDEX: -1000; LEFT: 0px; WIDTH: 700px; POSITION: absolute; TOP: 0px; HEIGHT: 600px" onclick="palette.visibility='hidden';curDiv.style.border = '';">
+</DIV>
+
+
+<SCRIPT LANGUAGE="JavaScript">
+var palette = new Object();
+palette = document.all.colorSelect.style;
+//document.onclick=showParent;
+
+/**************************************************************************************
+showParent
+a debugging function		
+**************************************************************************************/
+function showParent()
+{
+	//alert(event.offsetX + "\n" + event.offsetY);
+	alert(event.srcElement.parentElement.parentElement.style.posLeft + "\n" + event.srcElement.parentElement.parentElement.style.posTop 
+				+ "\n" + event.offsetX + "\n" + event.offsetY
+				+ "\n" + event.srcElement.parentElement.style.posLeft + "\n" + event.srcElement.parentElement.style.posTop
+				+ "\n" + event.srcElement.style.posLeft + "\n" + event.srcElement.style.posTop);
+	//alert(event.srcElement.parentElement.parentElement.outerHTML);
+}
+
+/**************************************************************************************
+showPalette
+show the guess color selection palette
+**************************************************************************************/
+function showPalette(obj)
+{
+	curDiv.style.border = "";
+    curDiv = obj;
+	obj.style.border = "inset black 2px";
+	//document.all.EvtHdlr.onclick = "palette.visibility='hidden';";
+    palette.posTop = event.srcElement.parentElement.parentElement.style.posTop + event.srcElement.style.posTop - palette.posHeight;
+    palette.posLeft = event.srcElement.parentElement.parentElement.style.posLeft + event.srcElement.style.posLeft + 20;
+    palette.visibility = "visible";
+}
+
+/**************************************************************************************
+setGuess
+update the guess cell with the color chosen from the palette
+**************************************************************************************/
+function setGuess(sColor)
+{
+    curDiv.style.backgroundColor = sColor;
+	curDiv.style.border = "";
+    palette.visibility = "hidden";
+	//document.all.EvtHdlr.onclick = "";
+}
+
+/**************************************************************************************
+newGame
+initialize a new game
+**************************************************************************************/
+function newGame()
+{
+	var arrTemp = new Array();
+
+	if (document.all.squares.value != "") intSquares = document.all.squares.value;
+	else intSquares = 5;
+	
+	if (document.all.colors.value != "") intColors = document.all.colors.value;
+	else intColors = 8;
+	
+	if (document.all.chkUserPalette.checked) arrTemp = arrUserPalette;
+	else arrTemp = arrPalette;
+	
+	if (intColors > 140) intColors = 140;
+	buildGuessDiv();
+	buildMasterDiv();
+	makePalette();
+	document.all.Answers.innerHTML = strGuessDiv;
+	document.all.Answers.style.posTop = 100;
+	document.all.Answers.style.posTop += palette.posHeight;
+	document.all.cover.style.visibility = "visible";
+	for(i=1; i<=intSquares; i++)
+	{
+		x = Math.floor(Math.random()*intColors);
+		//alert(x);
+	    eval("document.all.master_" + i + ".style.backgroundColor = '" + arrTemp[x] + "';");		
+	}
+
+	intGuesses = 0;
+}
+
+/**************************************************************************************
+gameDone
+finish game
+**************************************************************************************/
+function gameDone()
+{
+	document.all.cover.style.visibility = "hidden";
+}
+</SCRIPT>
+
+</BODY>
+</HTML>

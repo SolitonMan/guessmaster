@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>DHTML Guessing Game (Modern JS)</title>
+  <style>
+    body {
+      font-family: Verdana, sans-serif;
+      background: #f8f8f8;
+    }
+    .controls, .master, .answers, .palette, .user-palette, .color-picker {
+      position: absolute;
+      background: #fff;
+      border-radius: 4px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      padding: 12px;
+      margin: 0;
+    }
+    .controls { left: 20px; top: 20px; width: 350px; }
+    .master { left: 400px; top: 30px; min-width: 130px; height: 30px; background: antiquewhite; }
+    .answers { left: 400px; top: 100px; background: antiquewhite; }
+    .palette, .user-palette, .color-picker { display: none; z-index: 1000; }
+    .color-cell {
+      display: inline-block;
+      width: 20px; height: 20px;
+      border: 1px solid #333;
+      margin: 2px;
+      border-radius: 2px;
+      cursor: pointer;
+    }
+    .guess-row { margin-bottom: 8px; }
+    .guess-cell {
+      display: inline-block;
+      width: 20px; height: 20px;
+      border: 1px solid #333;
+      margin: 2px;
+      border-radius: 2px;
+      background: #fff;
+      cursor: pointer;
+    }
+    .guess-btn {
+      margin-left: 12px;
+      padding: 2px 12px;
+      font-size: 10pt;
+      cursor: pointer;
+    }
+    .result-cell {
+      display: inline-block;
+      min-width: 80px;
+      height: 20px;
+      border: 1px solid #333;
+      margin-left: 8px;
+      text-align: center;
+      background: #fff;
+      vertical-align: middle;
+      line-height: 20px;
+    }
+    .copyright {
+      font-size: 7pt;
+      margin-top: 24px;
+    }
+  </style>
+</head>
+<body>
+  <div class="controls">
+    <h2>GuessMaster Extreme</h2>
+    <table>
+      <tr>
+        <td>Start a new game:</td>
+        <td><button id="newGameBtn">New Game</button></td>
+      </tr>
+      <tr>
+        <td>Reveal the hidden code:</td>
+        <td><button id="revealBtn">Reveal Code</button></td>
+      </tr>
+      <tr>
+        <td>Set board background color:</td>
+        <td><button id="bgBtn">Background</button></td>
+      </tr>
+      <tr>
+        <td>Open the user palette:</td>
+        <td><button id="userPaletteBtn">User Palette</button></td>
+      </tr>
+      <tr>
+        <td>Use User Palette:</td>
+        <td><input type="checkbox" id="useUserPalette"> Use User Palette</td>
+      </tr>
+      <tr>
+        <td>No. of Colors:</td>
+        <td><input type="number" id="numColors" min="1" max="140" value="8"></td>
+      </tr>
+      <tr>
+        <td>No. of Squares:</td>
+        <td><input type="number" id="numSquares" min="1" max="10" value="5"></td>
+      </tr>
+    </table>
+    <p>
+      This is a flexible color guessing game. To start, click "New Game". The cells to the right will be covered and randomly assigned colors. Choose the number of colors and squares. Click each cell to select a color, then "GUESS". "X" means correct color and position, "O" means correct color but wrong position.
+    </p>
+    <div class="copyright">
+      This page and all contents are Copyright &copy;2001-2025 by <a href="mailto:dspaar@aol.com">David M. Spaar</a>
+    </div>
+  </div>
+  <div class="master" id="master"></div>
+  <div class="answers" id="answers"></div>
+  <div class="palette" id="palette"></div>
+  <div class="user-palette" id="userPalette"></div>
+  <div class="color-picker" id="colorPicker"></div>
+  <script type="module">
+    // Modern JS Guessing Game
+    const COLORS = [
+      "aliceblue","white","aqua","aquamarine","azure","beige","bisque","black","blanchedalmond","blue",
+      "blueviolet","brown","burlywood","cadetblue","chartreuse","chocolate","coral","cornflowerblue","cornsilk","crimson",
+      "cyan","darkblue","darkcyan","darkgoldenrod","darkgray","darkgreen","darkkhaki","darkmagenta","darkolivegreen","darkorange",
+      "darkorchid","darkred","darksalmon","darkseagreen","darkslateblue","darkslategray","darkturquoise","darkviolet","deeppink","deepskyblue",
+      "dimgray","dodgerblue","firebrick","floralwhite","forestgreen","fuchsia","gainsboro","ghostwhite","gold","goldenrod",
+      "gray","green","greenyellow","honeydew","hotpink","indianred","indigo","ivory","khaki","lavender",
+      "lavenderblush","lawngreen","lemonchiffon","lightblue","lightcoral","lightcyan","lightgoldenrodyellow","lightgreen","lightgrey","lightpink",
+      "lightsalmon","lightseagreen","lightskyblue","lightslategray","lightsteelblue","lightyellow","lime","limegreen","linen","magenta",
+      "maroon","mediumaquamarine","mediumblue","mediumorchid","mediumpurple","mediumseagreen","mediumslateblue","mediumspringgreen","mediumturquoise","mediumvioletred",
+      "midnightblue","mintcream","mistyrose","moccasin","navajowhite","navy","oldlace","olive","olivedrab","orange",
+      "orangered","orchid","palegoldenrod","palegreen","paleturquoise","palevioletred","papayawhip","peachpuff","peru","pink",
+      "plum","powderblue","purple","red","rosybrown","royalblue","saddlebrown","salmon","sandybrown","seagreen",
+      "seashell","sienna","silver","skyblue","slateblue","slategray","snow","springgreen","steelblue","tan",
+      "teal","thistle","tomato","turquoise","violet","wheat","blue","whitesmoke","yellow","yellowgreen"
+    ];
+    let paletteColors = [];
+    let userPalette = [];
+    let masterCode = [];
+    let guesses = [];
+    let numSquares = 5;
+    let numColors = 8;
+    let useUserPalette = false;
+    let guessCount = 0;
+
+    // DOM Elements
+    const masterDiv = document.getElementById('master');
+    const answersDiv = document.getElementById('answers');
+    const paletteDiv = document.getElementById('palette');
+    const userPaletteDiv = document.getElementById('userPalette');
+    const colorPickerDiv = document.getElementById('colorPicker');
+    const newGameBtn = document.getElementById('newGameBtn');
+    const revealBtn = document.getElementById('revealBtn');
+    const bgBtn = document.getElementById('bgBtn');
+    const userPaletteBtn = document.getElementById('userPaletteBtn');
+    const useUserPaletteChk = document.getElementById('useUserPalette');
+    const numColorsInput = document.getElementById('numColors');
+    const numSquaresInput = document.getElementById('numSquares');
+
+    // Utility
+    function randomPalette(colors, count) {
+      const arr = [...colors];
+      const result = [];
+      while (result.length < count && arr.length) {
+        const idx = Math.floor(Math.random() * arr.length);
+        result.push(arr.splice(idx, 1)[0]);
+      }
+      return result;
+    }
+
+    function buildMaster() {
+      masterDiv.innerHTML = '';
+      masterCode = [];
+      const colors = useUserPalette ? userPalette : paletteColors;
+      for (let i = 0; i < numSquares; i++) {
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        masterCode.push(color);
+        const cell = document.createElement('div');
+        cell.className = 'guess-cell';
+        cell.style.background = color;
+        cell.style.visibility = 'hidden'; // Hide until revealed
+        cell.id = `master_${i}`;
+        masterDiv.appendChild(cell);
+      }
+      // Cover
+      const cover = document.createElement('div');
+      cover.id = 'cover';
+      cover.style.position = 'absolute';
+      cover.style.top = '0';
+      cover.style.left = '0';
+      cover.style.width = `${numSquares * 24}px`;
+      cover.style.height = '30px';
+      cover.style.background = 'black';
+      cover.style.opacity = '0.7';
+      cover.style.zIndex = '10';
+      masterDiv.appendChild(cover);
+    }
+
+    function revealMaster() {
+      for (let i = 0; i < numSquares; i++) {
+        document.getElementById(`master_${i}`).style.visibility = 'visible';
+      }
+      const cover = document.getElementById('cover');
+      if (cover) cover.style.display = 'none';
+    }
+
+    function buildPalette() {
+      paletteDiv.innerHTML = '';
+      paletteDiv.style.display = 'block';
+      paletteDiv.style.left = '50px';
+      paletteDiv.style.top = '100px';
+      paletteDiv.style.width = 'auto';
+      paletteDiv.style.height = 'auto';
+      const colors = useUserPalette ? userPalette : paletteColors;
+      colors.forEach(color => {
+        const cell = document.createElement('div');
+        cell.className = 'color-cell';
+        cell.style.background = color;
+        cell.title = color;
+        cell.addEventListener('click', () => {
+          if (paletteDiv.currentCell) {
+            paletteDiv.currentCell.style.background = color;
+            paletteDiv.style.display = 'none';
+          }
+        });
+        paletteDiv.appendChild(cell);
+      });
+    }
+
+    function buildGuessRow() {
+      const row = document.createElement('div');
+      row.className = 'guess-row';
+      const guess = [];
+      for (let i = 0; i < numSquares; i++) {
+        const cell = document.createElement('div');
+        cell.className = 'guess-cell';
+        cell.addEventListener('click', () => {
+          paletteDiv.currentCell = cell;
+          buildPalette();
+        });
+        row.appendChild(cell);
+        guess.push(cell);
+      }
+      const btn = document.createElement('button');
+      btn.className = 'guess-btn';
+      btn.textContent = 'GUESS';
+      btn.addEventListener('click', () => checkGuess(guess, row));
+      row.appendChild(btn);
+      answersDiv.appendChild(row);
+    }
+
+    function checkGuess(guessCells, rowDiv) {
+      guessCount++;
+      let exact = 0, right = 0;
+      const guessColors = guessCells.map(cell => cell.style.background);
+      const masterColors = [...masterCode];
+      // Count exact matches
+      for (let i = 0; i < numSquares; i++) {
+        if (guessColors[i] === masterColors[i]) {
+          exact++;
+          guessColors[i] = masterColors[i] = null;
+        }
+      }
+      // Count right color, wrong position
+      for (let i = 0; i < numSquares; i++) {
+        if (guessColors[i]) {
+          const idx = masterColors.indexOf(guessColors[i]);
+          if (idx !== -1) {
+            right++;
+            masterColors[idx] = null;
+          }
+        }
+      }
+      // Show result
+      const resultCell = document.createElement('span');
+      resultCell.className = 'result-cell';
+      resultCell.textContent = exact ? 'X'.repeat(exact) : '';
+      if (right) resultCell.textContent += 'O'.repeat(right);
+      if (!resultCell.textContent) resultCell.textContent = 'NONE';
+      rowDiv.appendChild(resultCell);
+
+      // Win condition
+      if (exact === numSquares) {
+        revealMaster();
+        setTimeout(() => {
+          alert(`Congratulations! You've won in ${guessCount} turns.`);
+          if (confirm('Would you like another game?')) startGame();
+        }, 100);
+      }
+      // Disable further changes to this row
+      guessCells.forEach(cell => cell.style.pointerEvents = 'none');
+      // Add new guess row
+      buildGuessRow();
+    }
+
+    function startGame() {
+      numSquares = parseInt(numSquaresInput.value, 10) || 5;
+      numColors = parseInt(numColorsInput.value, 10) || 8;
+      useUserPalette = useUserPaletteChk.checked;
+      paletteColors = randomPalette(COLORS, Math.min(numColors, COLORS.length));
+      guessCount = 0;
+      answersDiv.innerHTML = '';
+      buildMaster();
+      buildGuessRow();
+    }
+
+    // Event Listeners
+    newGameBtn.addEventListener('click', startGame);
+    revealBtn.addEventListener('click', revealMaster);
+    bgBtn.addEventListener('click', () => {
+      // Show palette for background selection
+      paletteDiv.innerHTML = '';
+      paletteDiv.style.display = 'block';
+      paletteDiv.style.left = '550px';
+      paletteDiv.style.top = '200px';
+      COLORS.forEach(color => {
+        const cell = document.createElement('div');
+        cell.className = 'color-cell';
+        cell.style.background = color;
+        cell.title = color;
+        cell.addEventListener('click', () => {
+          masterDiv.style.background = color;
+          answersDiv.style.background = color;
+          paletteDiv.style.display = 'none';
+        });
+        paletteDiv.appendChild(cell);
+      });
+    });
+    userPaletteBtn.addEventListener('click', () => {
+      // Show user palette dialog
+      userPaletteDiv.innerHTML = '<h4>Select colors for your palette:</h4>';
+      userPaletteDiv.style.display = 'block';
+      userPaletteDiv.style.left = '250px';
+      userPaletteDiv.style.top = '200px';
+      userPaletteDiv.style.width = 'auto';
+      userPaletteDiv.style.height = 'auto';
+      // Color selection
+      COLORS.forEach(color => {
+        const cell = document.createElement('div');
+        cell.className = 'color-cell';
+        cell.style.background = color;
+        cell.title = color;
+        cell.addEventListener('click', () => {
+          if (!userPalette.includes(color) && userPalette.length < numColors) {
+            userPalette.push(color);
+            updateUserPaletteDisplay();
+          }
+        });
+        userPaletteDiv.appendChild(cell);
+      });
+      // User palette display
+      const paletteDisplay = document.createElement('div');
+      paletteDisplay.id = 'userPaletteDisplay';
+      paletteDisplay.style.marginTop = '12px';
+      userPaletteDiv.appendChild(paletteDisplay);
+      updateUserPaletteDisplay();
+      // Close button
+      const closeBtn = document.createElement('button');
+      closeBtn.textContent = 'CLOSE';
+      closeBtn.style.marginTop = '12px';
+      closeBtn.addEventListener('click', () => userPaletteDiv.style.display = 'none');
+      userPaletteDiv.appendChild(closeBtn);
+    });
+
+    function updateUserPaletteDisplay() {
+      const display = document.getElementById('userPaletteDisplay');
+      display.innerHTML = '';
+      userPalette.forEach((color, idx) => {
+        const cell = document.createElement('div');
+        cell.className = 'color-cell';
+        cell.style.background = color;
+        cell.title = color;
+        cell.addEventListener('click', () => {
+          userPalette.splice(idx, 1);
+          updateUserPaletteDisplay();
+        });
+        display.appendChild(cell);
+      });
+    }
+
+    // Start initial game
+    startGame();
+  </script>
+</body>
+</html>
